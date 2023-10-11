@@ -91,7 +91,7 @@ class AgentService:
 
         return self.create_user_resp_obj(message)
 
-    def user_history_process(self, req: UserInputDto) -> dict:
+    async def user_history_process(self, req: UserInputDto) -> dict:
         add_message_dto = AddMessageDto(
             user_email=req.user.email,
             app_key=req.app.app_key,
@@ -103,7 +103,7 @@ class AgentService:
             )
         )
         self.history.add_message(add_message_dto)
-        return self._get_user_history(req)
+        return await self._get_user_history(req)
 
 
     def create_user_resp_obj(self, message: str):
@@ -115,12 +115,12 @@ class AgentService:
         }
 
     async def _get_llm_response(self, req: UserInputDto, is_action) -> LLMResponse:
-        user_history = self._get_user_history(req)
+        user_history = await self._get_user_history(req)
         if is_action:
             return self.llm.get_task_command(user_history, app=req.app)
         return self.llm.get_question_answer(req.question, req.app, user_history)
 
-    def _get_user_history(self, req):
+    async def _get_user_history(self, req):
         user_history = await self.history.get_history(req.session_id)
         if user_history is None:
             user_history = []

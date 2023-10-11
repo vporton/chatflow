@@ -44,7 +44,7 @@ async def stream_completion(
     if cost_service.has_allowance_exceeded(current_user.email, user_input_req.app.app_key):
         raise HTTPException(status_code=402, detail="You have exceeded the free allowance for this app")
 
-    user_history = agent.user_history_process(user_input_req)
+    user_history = await agent.user_history_process(user_input_req)
     prompts, _ = llm_service.get_question_prompts(user_input_req.app, user_history, user_input_req.question)
     return StreamingResponse(
         get_completion_stream(prompts, user_input_req.app.app_model, user_input_req.app.app_temperature),

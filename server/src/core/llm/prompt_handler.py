@@ -190,7 +190,7 @@ def prepare_prompt_history(history: List[MessageCompletion]) -> List[MessageComp
         if count == 3:
             break
 
-    last_message = local_history[0]
+    last_message = local_history[0] if local_history else None
     for message in local_history[1:]:
         if last_message.context == message.context:
             message.context = ""

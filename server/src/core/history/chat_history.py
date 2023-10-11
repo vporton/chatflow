@@ -22,13 +22,16 @@ class ChatHistoryService:
         self.dao = dao
         self.redis = redis
 
+    def __getitem__(self, key):
+        return self.get_history(key)
+
     async def add_message(self, req: AddMessageDto):
         user_email = req.user_email
         app_key = req.app_key
-        session_id = req.session_id
+        key = user_email + "_" + app_key
 
         list_len = await self.redis.llen("chat_history_cache:" + key)
-        self.redis.hset("chat_history_cache:" + key, list_len, message)  # add to the end of the list
+        self.redis.hset("chat_history_cache:" + key, list_len, req.message)  # add to the end of the list
 
         self.persist_message(user_email, app_key, req.message)
 
